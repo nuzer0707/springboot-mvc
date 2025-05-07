@@ -63,6 +63,7 @@ public class ApiController {
 		String result = String.format("身高:%d 體重:%d BMI:%.2f ",h,w,bmisum);
 				
 		return result;
+		
 	}
 	
 	
