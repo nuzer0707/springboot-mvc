@@ -18,53 +18,74 @@ public class ApiController {
 	}
 
 	/**
-	 * 2. ?帶參數
-	 * 路徑: /greet?name=John&age=18
-	 * 路徑: /greet?name=Mary
-	 * 網址: http://localhost:8080/api/greet?name=John&age=18
-	 * 結果: Hi John, 18 (成年)
-	 * 網址: http://localhost:8080/api/greet?name=Mary
-	 * 結果: Hi Mary, 0 (未成年)
-	 * 限制: name 參數一定要加, age 為可選參數(有初始值 0)
-	 * */
+	 * 2. ?帶參數 路徑: /greet?name=John&age=18 路徑: /greet?name=Mary 網址:
+	 * http://localhost:8080/api/greet?name=John&age=18 結果: Hi John, 18 (成年) 網址:
+	 * http://localhost:8080/api/greet?name=Mary 結果: Hi Mary, 0 (未成年) 限制: name
+	 * 參數一定要加, age 為可選參數(有初始值 0)
+	 */
 	@GetMapping("/greet")
 	public String greet(@RequestParam(value = "name", required = true) String username,
-						@RequestParam(value = "age", required = false, defaultValue = "0") Integer userage) {
-		
-		String result = String.format("Hi %s %d (%s)", 
-				username, userage, userage >= 18 ? "成年" : "未成年");
+			@RequestParam(value = "age", required = false, defaultValue = "0") Integer userage) {
+
+		String result = String.format("Hi %s %d (%s)", username, userage, userage >= 18 ? "成年" : "未成年");
 		return result;
 	}
-	
+
 	// 3. 上述 2 的精簡寫法
 	// 方法參數名與請求參數名相同
 	@GetMapping("/greet2")
-	public String greet2(@RequestParam String name,
-						 @RequestParam(defaultValue = "0") Integer age) {
+	public String greet2(@RequestParam String name, @RequestParam(defaultValue = "0") Integer age) {
 
-		String result = String.format("Hi %s %d (%s)", 
-								name, age, age >= 18 ? "成年" : "未成年");
+		String result = String.format("Hi %s %d (%s)", name, age, age >= 18 ? "成年" : "未成年");
 		return result;
-		
+
 	}
-	
+
 	/**
-	 * 4. Lab 練習 I
-	 * 路徑: /bmi?h=170&w=60
+	 * 4. Lab 練習 I 路徑: /bmi?h=170&w=60 
 	 * 網址: http://localhost:8080/api/bmi?h=170&w=60
 	 * 執行結果: bmi = 20.76
-	 * */
-	@GetMapping("/bmi")
-	public String bmi(@RequestParam Integer h,
-										@RequestParam Integer w	) {
+	 * 
+	 */
+//	@GetMapping("/bmi")
+//	public String bmi(@RequestParam Integer h, @RequestParam Integer w) {
+//
+//		double bmisum = w / Math.pow((h * 0.01), 2);
+//
+//		String result = String.format("身高:%d 體重:%d BMI:%.2f (%s)", h, w, bmisum,
+//				bmisum >= 25 ? (bmisum >= 30 ? "肥胖" : "過重") : (bmisum < 18.5 ? "過輕" : "正常"));
+//
+//		return result;
+//
+//	}
+	
+	@GetMapping(value = "/bmi", produces = "application/json;charset=utf-8")
+	public String calcBmi(@RequestParam(required = false) Double h,
+												@RequestParam(required = false) Double w) {
+	
+		if(h == null||w == null) {
+			return """
+					{
+					  "status": 400,
+					  "message": "請提供身高體重",
+					  "data": null
+					}
+					""";
+			}
 		
-		double bmisum =  w/Math.pow((h*0.01),2);
-		
-		String result = String.format("身高:%d 體重:%d BMI:%.2f ",h,w,bmisum);
-				
-		return result;
-		
+		double bmi = w / Math.pow(h*0.01, 2);
+		return """
+				{
+				  "status": 200,
+				  "message": "BMI 計算成功",
+				  "data": {
+				    "height": %.1f,
+				    "weight": %.1f,
+				    "bmi": %.2f
+				  }
+				}
+			   """.formatted(h, w, bmi);
 	}
-	
-	
+		
+
 }
