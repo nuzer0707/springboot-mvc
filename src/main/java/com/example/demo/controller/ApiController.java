@@ -180,7 +180,7 @@ public class ApiController {
 	 * 
 	 * * */
 	@GetMapping(value = "/book/{id}",produces = "application/json;charset=utf-8")
-//	public ResponseEntity<ApiResponse<Book>> getBookById(@PathVariable(name = "id")Integer id){
+	//public ResponseEntity<ApiResponse<Book>> getBookById(@PathVariable(name = "id")Integer id){
 	public ResponseEntity<ApiResponse<Book>> getBookById(@PathVariable Integer id){	
 		List<Book> books = List.of(
 				new Book(1,"小叮噹",12.5,20,false),
@@ -198,5 +198,32 @@ public class ApiController {
 		return ResponseEntity.ok(ApiResponse.success("查詢成功", book));
 		
 	}
+	
+	@GetMapping("/book/pub/{isPub}")
+	public ResponseEntity<ApiResponse<List<Book>>> queryBook(@PathVariable Boolean isPub){
+		
+		List<Book> books = List.of(
+				new Book(1,"小叮噹",12.5,20,false),
+				new Book(2,"老夫子",10.5,30,false),
+				new Book(3,"好小子",8.5,40, true),
+				new Book(4,"尼羅河",14.5,50,true)
+		);
+		
+		List<Book> queryBooks = books.stream()
+																	.filter(book->book.getPub().equals(isPub))
+																	.toList();
+		
+		if(queryBooks.size() == 0) {
+			return ResponseEntity.badRequest().body(ApiResponse.error("查無此書"));
+		}
+		
+		// 取得書籍
+		return ResponseEntity.ok(ApiResponse.success("查詢成功"+(isPub?"出刊":"停刊"), queryBooks));
+		
+	}
+	
+	
+	
+	
 	
 }
